@@ -1,36 +1,31 @@
-import React from 'react';
-import Navbar from "../components/Navbar";
+import React from "react";
+import AdminSecretTrigger from "../components/AdminSecretTrigger";
 import ProductCard from "../components/ProductCard";
 import { perfumes } from "../lib/data";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white pb-20">
-      <Navbar />
-      
-      {/* Hero Section */}
-      <section className="py-24 px-6 text-center">
-        <h1 className="text-3xl md:text-5xl font-serif mb-6 tracking-tight text-gray-900 leading-tight">
-          Fragrance to tell <br /> your story.
+    <main className="bg-white text-neutral-950">
+      <AdminSecretTrigger />
+
+      <section className="mx-auto flex min-h-[380px] max-w-5xl flex-col items-center justify-center px-6 pb-20 pt-24 text-center md:min-h-[430px]">
+        <h1 className="max-w-3xl font-serif text-4xl leading-[0.95] tracking-[-0.04em] text-neutral-950 sm:text-5xl md:text-6xl">
+          Fragrance to tell
+          <br />
+          your story.
         </h1>
-        <p className="text-gray-500 max-w-lg mx-auto font-light text-sm md:text-base leading-relaxed uppercase tracking-widest">
+
+        <p className="mt-9 text-[11px] font-medium uppercase tracking-[0.28em] text-neutral-500 sm:text-xs">
           The Premier Collection from Western Visayas
         </p>
-        <div className="mt-10 h-[1px] w-20 bg-black mx-auto"></div>
+
+        <div className="mt-12 h-px w-20 bg-neutral-950" />
       </section>
 
-      {/* Product Grid */}
-      <section className="max-w-7xl mx-auto px-6 md:px-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-16">
+      <section id="shop" className="mx-auto max-w-7xl scroll-mt-36 px-6 pb-28 sm:px-8 lg:px-10">
+        <div className="grid grid-cols-1 gap-x-12 gap-y-20 sm:grid-cols-2 lg:grid-cols-4">
           {perfumes.map((perfume) => (
-            <ProductCard 
-              key={perfume.id} 
-              name={perfume.name}
-              price={perfume.price}
-              scentFamily={perfume.scentFamily}
-              image={perfume.image}
-              hoverImage={perfume.hoverImage}
-            />
+            <ProductCard key={perfume.code} {...perfume} />
           ))}
         </div>
       </section>

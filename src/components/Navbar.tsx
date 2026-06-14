@@ -1,36 +1,134 @@
 "use client";
-import React from 'react';
+
 import Link from "next/link";
-import { Search, ShoppingBag, Menu } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { useState } from "react";
+import { useCart } from "./CartProvider";
+
+const navLinks = [
+  { label: "Shop", href: "/#shop", activePath: "/" },
+  { label: "Best Sellers", href: "/best-sellers", activePath: "/best-sellers" },
+  { label: "Discovery", href: "/discovery", activePath: "/discovery" },
+  { label: "About", href: "/about", activePath: "/about" },
+];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { totalItems, hasHydrated } = useCart();
+
+  const getIsActive = (activePath: string) => {
+    if (activePath === "/") {
+      return pathname === "/" || pathname === "/shop";
+    }
+
+    return pathname === activePath;
+  };
+
+  const linkClassName = (isActive: boolean) =>
+    `relative text-[10px] font-medium uppercase tracking-[0.32em] transition-colors duration-300 ${
+      isActive
+        ? "text-neutral-950 after:absolute after:-bottom-2 after:left-0 after:h-px after:w-full after:bg-neutral-950"
+        : "text-neutral-500 hover:text-neutral-950"
+    }`;
+
   return (
-    <nav className="w-full bg-white border-b border-gray-100 pt-8 pb-4 px-6 md:px-10">
-      <div className="flex justify-center mb-6">
-        <Link href="/" className="text-2xl md:text-3xl font-serif tracking-[0.25em] uppercase text-black">
+    <header className="sticky top-0 z-50 border-b border-neutral-950/5 bg-white/95 backdrop-blur-sm">
+      <div className="relative mx-auto flex min-h-[116px] max-w-7xl flex-col items-center justify-center px-6 py-6">
+        <div className="flex w-full items-center justify-between md:absolute md:inset-x-0 md:top-1/2 md:-translate-y-1/2 md:px-8 lg:px-10">
+          <Link
+            href="/search"
+            aria-label="Open search page"
+            className="hidden rounded-full p-2 text-neutral-900 transition duration-300 hover:bg-neutral-100 md:inline-flex"
+          >
+            <Search size={20} strokeWidth={1.7} />
+          </Link>
+
+          <button
+            type="button"
+            aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((currentState) => !currentState)}
+            className="rounded-full p-2 text-neutral-900 transition duration-300 hover:bg-neutral-100 md:hidden"
+          >
+            {isMenuOpen ? <X size={22} strokeWidth={1.5} /> : <Menu size={22} strokeWidth={1.5} />}
+          </button>
+
+          <Link
+            href="/"
+            className="text-center font-serif text-xl uppercase tracking-[0.42em] text-neutral-950 transition-opacity duration-300 hover:opacity-70 sm:text-2xl md:hidden"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Scent of Visayas
+          </Link>
+
+          <div className="flex items-center gap-1 md:ml-auto">
+            <Link
+              href="/search"
+              aria-label="Open search page"
+              className="rounded-full p-2 text-neutral-900 transition duration-300 hover:bg-neutral-100 md:hidden"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Search size={19} strokeWidth={1.7} />
+            </Link>
+
+            <Link
+              href="/cart"
+              aria-label={`Open cart page${totalItems > 0 ? ` with ${totalItems} items` : ""}`}
+              className="relative rounded-full p-2 text-neutral-900 transition duration-300 hover:bg-neutral-100"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <ShoppingBag size={20} strokeWidth={1.7} />
+
+              {hasHydrated && totalItems > 0 ? (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-neutral-950 px-1.5 text-[10px] font-medium leading-none text-white">
+                  {totalItems > 99 ? "99+" : totalItems}
+                </span>
+              ) : null}
+            </Link>
+          </div>
+        </div>
+
+        <Link
+          href="/"
+          className="hidden text-center font-serif text-3xl uppercase tracking-[0.45em] text-neutral-950 transition-opacity duration-300 hover:opacity-70 md:block lg:text-4xl"
+        >
           Scent of Visayas
         </Link>
+
+        <nav aria-label="Primary navigation" className="mt-7 hidden md:block">
+          <ul className="flex items-center justify-center gap-10">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className={linkClassName(getIsActive(link.activePath))}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
 
-      <div className="max-w-7xl mx-auto flex justify-between items-center relative">
-        <div className="flex-1 hidden md:block">
-          <Search size={18} className="cursor-pointer hover:opacity-50 transition-opacity" />
-        </div>
-
-        <ul className="flex gap-6 md:gap-10 text-[10px] uppercase tracking-[0.2em] font-medium text-gray-800">
-          <li className="hover:text-gray-400 transition-colors cursor-pointer">Shop</li>
-          <li className="hover:text-gray-400 transition-colors cursor-pointer">Best Sellers</li>
-          <li className="hover:text-gray-400 transition-colors cursor-pointer">Discovery</li>
-          <li className="hover:text-gray-400 transition-colors cursor-pointer">About</li>
-        </ul>
-
-        <div className="flex-1 flex justify-end gap-5 items-center">
-          <div className="relative cursor-pointer hover:opacity-50 transition-opacity">
-            <ShoppingBag className="w-5 h-5 md:w-6 md:h-6 stroke-[1.5px]" />
-          </div>
-          <Menu size={20} className="md:hidden cursor-pointer" />
-        </div>
-      </div>
-    </nav>
+      {isMenuOpen ? (
+        <nav aria-label="Mobile navigation" className="border-t border-neutral-950/5 bg-white px-6 py-5 md:hidden">
+          <ul className="mx-auto flex max-w-sm flex-col gap-1">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`block border-b border-neutral-950/5 py-4 text-center text-[11px] font-medium uppercase tracking-[0.32em] transition-colors duration-300 ${
+                    getIsActive(link.activePath) ? "text-neutral-950" : "text-neutral-500 hover:text-neutral-950"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
+    </header>
   );
 }
